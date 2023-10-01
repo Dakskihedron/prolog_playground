@@ -1,0 +1,255 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -*- LaTeX -*- %%%%%%
+%
+%    FILE: 225Tutorial2.tex
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt]{article}
+\usepackage{auck}
+\usepackage{latexsym}
+\usepackage[right=3cm,bottom=3cm]{geometry}
+\usepackage{amssymb, amsmath, amsfonts}
+%\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{ifthen}
+\usepackage{float}
+
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{verbatim}
+\usepackage{amsthm, framed, color, colortbl}
+\usepackage{booktabs}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{mathtools}
+\usepackage{ulem}
+\usepackage{ifthen}
+
+
+\usepackage{enumitem, multicol}
+
+\newcommand{\ask}{\mathsf{ask}\hspace{0.2cm}}
+\newcommand{\dom}{\mathrm{dom}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+%\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Obs}{\mathrm{Percepts}}
+\newcommand{\QQ}{\mathbb{QQ}}
+
+\def\blob{$\bullet$}
+\def\nml{\Delta}
+\def\ds{\displaystyle}
+
+
+\newcommand{\soln}[1]{ \ifthenelse{\boolean {sol}}{\noindent {\it \textbf{Solution.}}   {\em \it #1}}{}}
+\newboolean{sol}
+
+\setboolean{sol}{false}
+
+\setboolean{sol}{true}
+
+
+\paper{COMPSCI 367}
+\rband{Week 6}
+\thetitle{Tutorial}
+
+\begin{document}
+\makeband
+
+
+\begin{Q}
+
+\vspace{+0.5ex}
+
+
+
+
+\item Suppose a delivery robot must carry out a number of delivery activities, $a,b,c,d$, and $e$. Suppose that each activity happens at any of times 1, 2, 3, or 4. Let $A$ be the variable reprsenting the time that activity $a$ will occur, and similarly for the other activities. The variable domains, which represent possible times for each of the deliveries, are
+    \begin{align*}
+        &dom(A) = \{1,2,3,4\}, \qquad dom(B) = \{1,2,3,4\}, \qquad dom(C)=\{1,2,3,4\},\\
+        &dom(D) = \{1,2,3,4\}, \qquad dom(E) = \{1,2,3,4\}. &
+    \end{align*}
+
+    Suppose the following constraints must be satisfied:
+    \begin{align*}
+    &B\neq 3, C\neq 2, A\neq B, B\neq C, C<D, A=D,\\
+    &E<A, E<B, E<C, E<D, B\neq D
+    \end{align*}
+    The aim is the find an assignment of value to each activity, such that all the constraints are satisfied.
+
+    We define the evaluation function for any assignment by the number of constraints that it does NOT satisfy. E.g.,
+
+    \begin{itemize}
+    \item The assignment $(A=2, B=2,C=3,D=1,E=1)$ has  evaluation 4 as four constraints $A\neq B, B\neq D, A=D, C<D$ are not satisfied.
+    \item The assignment $(A=4,B=2,C=3,D=4,E=4)$ has evaluation 4 as four constraints $E<A,E<B,E<C,E<D$ are not satisfied.
+    \end{itemize}
+    We would like to employ genetic algorithm to solve the problem. Each candidate solution $(A=a,B=b,C=c,D=d,E=e)$ of the form can be encoded by a string $abcde$. E.g., $(A=2, B=2,C=3,D=1,E=1)$ is encoded as 22311.  Answer the following questions
+    \begin{itemize}
+        \item[(a)] Perform crossover over the two candidate solutions $(A=2, B=2,C=3,D=1,E=1)$ and $(A=4,B=2,C=3,D=4,E=4)$ on the crossing site 4. What is the outcome and its evaluation?
+        \item[(b)] Using examples, briefly discuss how genetic algorithm may help desirable ``traits'' of a candidate solution to be preserved in the population thereby improving the solution found.
+    \end{itemize}
+
+{\bf Answer.}
+
+    \begin{enumerate}
+    \item Crossing over 22311 and 42344 at crossing site 4 produces us two solutions: 22314 and 42341, with evaluation 7 and 0 respectively.
+    \item Genetic algorithm helps to preserve desirable traits within a population. For example, as demonstrated in (a), the candidate solution $(A=2, B=2,C=3,D=1,E=1)$ has low evaluation mainly because of $E=1$, and the candidate solution $(A=4,B=2,C=3,D=4,E=4)$ has low evaluation mainly because of the assignments to the first four variables.
+        \begin{itemize}
+        \item If these two were to mate, using the crossing over operation, some offspring would inherit the good traits of both.
+        \item Using the preferential selection operation, the offspring that preserves the better traits will be fitter and more likely to survive than those that do not.
+        \end{itemize}
+    \end{enumerate}
+
+
+
+\item In a machine learning scenario, suppose we are given a dataset
+\begin{table}[H]\centering
+\begin{tabular}{ccc|c}
+$x_1$ & $x_2$ & $x_3$ & $y$ \\ \hline
+0  & 0 & 0 & 1 \\
+0  & 0 & 1 & 0 \\
+0  & 1 & 0 & 1 \\
+0  & 1 & 1 & 0 \\
+1  & 0 & 0 & 1 \\
+1  & 0 & 1 & 1 \\
+1  & 1 & 0 & 1 \\
+1  & 1 & 1 & 1
+\end{tabular}
+\end{table}
+where $x_1,x_2,x_3$ are input features, and $y$ is the output. For example, when $x_1=0,x_2=0$ and $x_3=1$, the output $y=0$.
+
+We would like to develop a function of the form
+\[
+y=\begin{cases}
+    0 & \text{$w_1x_1+w_2x_2+w_3x_3<0$}\\
+    1 & \text{otherwise}
+\end{cases}
+\]
+to capture the association between the input features and the output. We require that each $w_i$ to be either $-1,0$ or $1$.
+Hence, a candidate solution specifies the values of $w_1,w_2,w_3$.
+
+
+\medskip
+
+Given $(w_1,w_2,w_3)$, to compute the evaluation: For each $x_1,x_2,x_3$
+\begin{enumerate}
+\item First, compute the weighted sum $s=w_1x_1+w_2x_2+w_3x_3$; and
+\item Then determine $y_c=0$ if $s<0$ and $y_c=1$ otherwise.
+\item Then compare $y_c$ against $y$, the true output.
+\end{enumerate}
+This produces a table. For example, if $w_1=-1,w_2=0,w_3=1$
+
+\begin{table}[H]\centering
+\begin{tabular}{ccccc|c}
+$x_1$&$x_2$&$x_3$& $y_c$ & $y$ & $y_c=y$?\\ \hline
+0&0&0&1&1& yes \\
+0&0&1&1&0& no\\
+0&1&0&1&1& yes\\
+0&1&1&1&0& no\\
+1&0&0&0&1& no\\
+1&0&1&1&1& yes\\
+1&1&0&0&1& no\\
+1&1&1&1&1& yes
+\end{tabular}
+\end{table}
+The evaluation of the candidate solution $(w_1,w_2,w_3)$ is the number of ``no''s. For example, the evaluation of $(w_1=-1,w_2=0,w_3=1)$ is 4.
+
+Describe how you would apply genetic algorithm to solve this problem. Use an example run-thru to illustrate the procedures.
+
+\medskip
+
+{\bf Answer.}
+
+
+To apply genetic algorithm, we need to set the following:
+\begin{itemize}
+\item Chromosomes: These are just the string $w_1w_2w_3$, for example, we can have the string $(-1)01$ to denote the solution $w_1=-1,w_2=0,w_3=1$.
+\item Fitness function: The fitness function is simply $8-valuation$, i.e., the number of ``no''s in the table above.
+\end{itemize}
+To illustrate the process we use a possible run-thru:
+\begin{itemize}
+\item \textbf{Step 0:} Initialization of the population. Suppose we randomly generate a population of size 4:
+\[
+    (-1)01, (-1)00, 01(-1), 1(01)1
+\]
+
+\item \textbf{Step 1:}
+\begin{enumerate}
+    \item \textbf{Selection of the mating pool:}
+    \begin{table}[H]\centering
+    \begin{tabular}{ccc|c}
+        $w_1$ & $w_2$ & $w_3$ & $fitness$ \\ \hline
+        -1 & 0 & 1 & 4 \\
+        -1 & 0 & 0 & 2 \\
+        0 & 1 & -1 & 6 \\
+        1 & -1 & 1 & 5
+    \end{tabular}
+    \end{table}[H]
+    Using preferential selection, suppose the following solutions are randomly selected according to the fitness probability distribution:
+    \[
+        (-1)01, 01(-1), 01(-1), 1(-1)1
+    \]
+
+    \item \textbf{Crossover:} Suppose that the first two and last two solutions are randomly mated, with crossing sites 2 and 1 respectively. We have
+    \[
+        \text{crossover}((-1)01, 01(-1), 2) = ((-1)0(-1), 011)
+    \]
+    and
+    \[
+        \text{crossover}(01(-1), 1(-1)1) = (0(-1)1, 11(-1))
+    \]
+
+    \item For simplicity, assume no random mutation takes place.
+\end{enumerate}
+
+\item \textbf{Step 2:}
+\begin{enumerate}
+    \item \textbf{New population:}
+    \begin{table}[H]\centering
+    \begin{tabular}{ccc|c}
+        $w_1$ & $w_2$ & $w_3$ & $fitness$ \\ \hline
+        -1 & 0 & -1 & 4 \\
+        0 & 1 & 1 & 6 \\
+        0 & -1 & 1 & 4 \\
+        1 & 1 & -1 & 7
+    \end{tabular}
+    \end{table}[H]
+    Using preferential selection, suppose the following solutions are randomly selected according to the fitness probability distribution:
+    \[
+        011, 0(-1)1, (-1)0(-1), 11(-1)
+    \]
+
+    \item \textbf{Crossover:} Suppose that the first two and last two solutions are randomly mated, with crossing sites 2 and 1 respectively.
+    \[
+        \text{crossover}(011, 0(-1)1, 2) = (011, 0(-1)1)
+    \]
+    and
+    \[
+        \text{crossover}((-1)0(-1), 11(-1)) = ((-1)1(-1), 10(-1))
+    \]
+
+    \item For simplicity, assume no random mutation takes place.
+\end{enumerate}
+
+\item We arrive at the new population:
+\begin{table}[H]\centering
+\begin{tabular}{ccc|c}
+    $w_1$ & $w_2$ & $w_3$ & $fitness$ \\ \hline
+    0 & 1 & 1 & 6 \\
+    0 & -1 & 1 & 4 \\
+    -1 & 1 & -1 & 4 \\
+    1 & 0 & -1 & 8
+\end{tabular}
+\end{table}[H]
+The last solution, $(w_1, w_2, w_3) = (1, 0, -1)$, is the optimal solution.
+
+\end{itemize}
+
+
+
+\end{Q}
+
+\end{document}
+
+

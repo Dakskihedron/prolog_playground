@@ -1,0 +1,27 @@
+As for the relationship between the environment and the agent
+
+The agent can call the evironment with action and get reward-and-state back:
+     envronment implements env.do(action)
+     agent implements ag.do(number_of_steps)
+
+Alternanative is
+   envronment implements env.do(action) -> (reward, state)
+   agent implements ag.observe(rew, state) -> action
+
+   interface:
+     act = ag.initial_action(state)
+     for i in range(num_steps):
+	 (rew,state) = env.do(act)
+         act = ag. select_action(rew,state)
+
+   for multiple agents:
+
+    actions = (ag.initial_action() for ag in agents)
+    for i in range(num_steps):
+ 	 (rewards,state) = env.do(actions)
+        actions = (ag.select_action(rew,state) for (ag,rev) in zip(agents, rewards))
+
+
+
+should be SARSA
+ so environment should return R,S
